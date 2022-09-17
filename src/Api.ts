@@ -1,7 +1,7 @@
 import { OAuth2Client, OAuth2Fetch } from '@badgateway/oauth2-client';
-import { RequestError } from '@src/RequestError';
-import { Subreddit } from '@src/Subreddit';
-import { Storage, MemoryStorage } from '@src/Storage';
+import { RequestError } from './RequestError';
+import { Subreddit } from './Subreddit';
+import { Storage, MemoryStorage } from './Storage';
 
 export interface Config {
   clientId: string;
@@ -24,7 +24,7 @@ export interface User {
   total_karma: number;
 }
 
-export type AuthListener = (isAuthenticated: boolean) => void;
+export type AuthListener = (username: string, isAuthenticated: boolean) => void;
 
 /**
  *
@@ -37,7 +37,6 @@ export class Api {
   protected readonly storage: Storage;
   protected request: OAuth2Fetch;
   protected me: User|null = null;
-  // protected firebaseCreds: UserCredential|null = null;
   protected authListeners: AuthListener[] = [];
 
   /**
@@ -61,7 +60,7 @@ export class Api {
    */
   public onAuthChange = (listener: AuthListener): void => {
     this.authListeners.push(listener);
-    listener(this.isAuthenticated());
+    listener(this.me ? this.me.name : '',  this.isAuthenticated());
   }
 
   /**
@@ -74,7 +73,6 @@ export class Api {
       const m = await this.storage.get(`${this.storagePrefix}authMe.${this.id}`);
       if (m) {
         this.me = m;
-        // this.firebaseCreds = await firebase.signIn(creds.username);
         this.triggerAuth(true);
       }
     }
@@ -86,13 +84,11 @@ export class Api {
   public signIn = async (username: string, password: string): Promise<boolean> => {
     try {
       this.me = null;
-      // this.firebaseCreds = null;
       this.request = this.createRequest(username, password);
 
       const m = await this.storage.get(`${this.storagePrefix}authMe.${this.id}`);
       if (m) {
         this.me = m;
-        // this.firebaseCreds = await firebase.signIn(username);
         this.triggerAuth(true);
 
         return true;
@@ -110,7 +106,6 @@ export class Api {
       }
 
       this.me = await resp.json();
-      // this.firebaseCreds = await firebase.signIn(username);
       await this.storage.set(`${this.storagePrefix}authMe.${this.id}`, this.me, this.authExpiration);
       await this.storage.set(`${this.storagePrefix}authCreds.${this.id}`, {username, password}, this.authExpiration);
       this.triggerAuth(true);
@@ -133,7 +128,6 @@ export class Api {
     await this.storage.remove(`${this.storagePrefix}authCreds.${this.id}`);
     await this.storage.remove(`${this.storagePrefix}authToken.${this.id}`);
     this.me = null;
-    // this.firebaseCreds = null;
     this.triggerAuth(false);
   }
 
@@ -150,7 +144,7 @@ export class Api {
   public triggerAuth = (isAuthenticated: boolean): void => {
     for (let i = 0; i < this.authListeners.length; i++) {
       const listener = this.authListeners[i];
-      listener(isAuthenticated);
+      listener(this.me ? this.me.name : '',  isAuthenticated);
     }
   }
 
