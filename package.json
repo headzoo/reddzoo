@@ -1,0 +1,21 @@
+{
+  "name": "@headz/reddzoo",
+  "version": "0.0.1",
+  "description": "Reddit API for JavaScript",
+  "main": "dist/index.js",
+  "repository": "https://github.com/headzoo/reddzoo",
+  "author": "Sean Hickey",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js watch"
+  },
+  "dependencies": {
+    "@badgateway/oauth2-client": "^2.0.16"
+  },
+  "devDependencies": {
+    "esbuild": "^0.15.7",
+    "typescript": "^4.8.3"
+  }
+}
