@@ -7,7 +7,7 @@ export interface Storage {
 /**
  * Stores values in memory.
  */
-export class MemoryStorage extends Storage {
+export class MemoryStorage implements Storage {
   protected readonly values: Record<string, any> = {};
 
   /**

@@ -1,6 +1,6 @@
-import { Api, Config, User } from '@src/Api';
-import { Subreddit, ModQueueItem, Note, Rule, Comment, WikiPage } from '@src/Subreddit';
-import { Storage, MemoryStorage } from '@src/Storage';
+import { Api, Config, User } from './Api';
+import { Subreddit, ModQueueItem, Note, Rule, Comment, WikiPage } from './Subreddit';
+import { Storage, MemoryStorage } from './Storage';
 
 export {
   Api,
