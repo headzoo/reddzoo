@@ -1,4 +1,5 @@
 const esbuild = require('esbuild');
+const { dtsPlugin } = require('esbuild-plugin-d.ts');
 
 esbuild
   .build({
@@ -7,6 +8,7 @@ esbuild
     ],
     bundle: true,
     minify: false,
+    plugins: [dtsPlugin()],
     watch: process.argv[2] === 'watch',
     sourcemap: process.env.NODE_ENV !== "production",
     target: ["chrome58", "firefox57"],
