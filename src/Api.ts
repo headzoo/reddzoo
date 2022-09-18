@@ -2,6 +2,7 @@ import { OAuth2Client, OAuth2Fetch } from '@badgateway/oauth2-client';
 import { RequestError } from './RequestError';
 import { Subreddit } from './Subreddit';
 import { Storage, MemoryStorage } from './Storage';
+import { AuthEvent, AuthListener } from './AuthEvent';
 
 export interface Config {
   clientId: string;
@@ -23,8 +24,6 @@ export interface User {
   comment_karma: number;
   total_karma: number;
 }
-
-export type AuthListener = (username: string, isAuthenticated: boolean) => void;
 
 /**
  *
@@ -60,7 +59,8 @@ export class Api {
    */
   public onAuthChange = (listener: AuthListener): void => {
     this.authListeners.push(listener);
-    listener(this.me ? this.me.name : '',  this.isAuthenticated());
+    const e = new AuthEvent(this.me ? this.me.name : '',  this.isAuthenticated());
+    listener(e);
   }
 
   /**
@@ -73,7 +73,7 @@ export class Api {
       const m = await this.storage.get(`${this.storagePrefix}authMe.${this.id}`);
       if (m) {
         this.me = m;
-        this.triggerAuth(true);
+        await this.triggerAuth(true);
       }
     }
   }
@@ -89,7 +89,10 @@ export class Api {
       const m = await this.storage.get(`${this.storagePrefix}authMe.${this.id}`);
       if (m) {
         this.me = m;
-        this.triggerAuth(true);
+        if ((await this.triggerAuth(true)).isPrevented) {
+          this.me = null;
+          return false;
+        }
 
         return true;
       }
@@ -101,21 +104,24 @@ export class Api {
         }),
       });
       if (!resp.ok && resp.status === 401) {
-        this.triggerAuth(false);
+        await this.triggerAuth(false);
         return false;
       }
 
       this.me = await resp.json();
       await this.storage.set(`${this.storagePrefix}authMe.${this.id}`, this.me, this.authExpiration);
       await this.storage.set(`${this.storagePrefix}authCreds.${this.id}`, {username, password}, this.authExpiration);
-      this.triggerAuth(true);
+      if ((await this.triggerAuth(true)).isPrevented) {
+        await this.logOut();
+        return false;
+      }
 
       return true;
     } catch (error) {
       console.log(error);
     }
 
-    this.triggerAuth(false);
+    await this.triggerAuth(false);
 
     return false;
   }
@@ -128,7 +134,7 @@ export class Api {
     await this.storage.remove(`${this.storagePrefix}authCreds.${this.id}`);
     await this.storage.remove(`${this.storagePrefix}authToken.${this.id}`);
     this.me = null;
-    this.triggerAuth(false);
+    await this.triggerAuth(false);
   }
 
   /**
@@ -141,11 +147,18 @@ export class Api {
   /**
    * @param isAuthenticated
    */
-  public triggerAuth = (isAuthenticated: boolean): void => {
+  public triggerAuth = async (isAuthenticated: boolean): Promise<AuthEvent> => {
+    const e = new AuthEvent(this.me ? this.me.name : '',  isAuthenticated);
     for (let i = 0; i < this.authListeners.length; i++) {
       const listener = this.authListeners[i];
-      listener(this.me ? this.me.name : '',  isAuthenticated);
+      listener(e);
+      if (isAuthenticated && e.isPrevented) {
+        await this.logOut();
+        return e;
+      }
     }
+
+    return e;
   }
 
   /**

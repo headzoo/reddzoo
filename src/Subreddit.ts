@@ -2,6 +2,7 @@ import { Api } from './Api';
 import { Storage } from './Storage';
 import { Comment } from './objects/Comment';
 import { ModQueueItem } from './objects/ModQueueItem';
+import { Moderator } from './objects/Moderator';
 import { Note } from './objects/Note';
 import { Rule } from './objects/Rule';
 import { WikiPage } from './objects/WikiPage';
@@ -22,6 +23,17 @@ export class Subreddit {
     protected readonly storage: Storage,
     public storagePrefix: string,
   ) {
+  }
+
+  /**
+   *
+   */
+  public getModerators = async (): Promise<Moderator[]> => {
+    const resp = await this.api.get<any>(`/r/${this.name}/about/moderators`);
+
+    return resp.data.children.map((child: any) => {
+      return new Moderator(this, child);
+    });
   }
 
   /**
