@@ -66,7 +66,7 @@ export class Subreddit {
 
     return resp.mod_notes.filter((note: any) => {
       return note.type === 'NOTE';
-    }).map((note: any) => new Note(this, note));
+    }).map((note: any) => new Note(this, note, username));
   }
 
   /**
@@ -84,7 +84,7 @@ export class Subreddit {
       note,
     });
 
-    return new Note(this, resp);
+    return new Note(this, resp, username);
   }
 
   /**
@@ -101,7 +101,7 @@ export class Subreddit {
     banMessage: string,
     duration: number,
   ): Promise<boolean> => {
-    await this.api.post<any>('/r/${this.name}/api/friend', {
+    await this.api.post<any>(`/r/${this.name}/api/friend`, {
       type: 'banned',
       name: username,
       ban_context: `t1_${commentId}`,

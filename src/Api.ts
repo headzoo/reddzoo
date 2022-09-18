@@ -191,12 +191,51 @@ export class Api {
    * @param path
    */
   public get = async <T>(path: string): Promise<T> => {
-    const resp = await this.request.fetch(`${this.baseUrl}${path}`, {
-      method: 'GET',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
-    });
+    return await this.req<T>('GET', path);
+  }
+
+  /**
+   * @param path
+   * @param body
+   */
+  public post = async <T>(path: string, body: Record<string, string> = {}): Promise<T> => {
+    return await this.req('POST', path, body);
+  }
+
+  /**
+   * @param path
+   */
+  public delete = async <T>(path: string): Promise<T> => {
+    return await this.req<T>('DELETE', path);
+  }
+
+  /**
+   * @param method
+   * @param path
+   * @param body
+   */
+  protected req = async <T>(method: string, path: string, body: Record<string, string> = {}): Promise<T> => {
+    let config: RequestInit;
+    if (method === 'POST') {
+      config = {
+        method: 'POST',
+        body: this.buildFormBody(body),
+        headers: new Headers({
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        }),
+      };
+    } else {
+      config = {
+        method: method,
+        headers: new Headers({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }),
+      };
+    }
+
+    const resp = await this.request.fetch(`${this.baseUrl}${path}`, config);
     if (!resp.ok) {
       throw new RequestError(resp.statusText, resp.status);
     }
@@ -205,26 +244,12 @@ export class Api {
   }
 
   /**
-   * @param path
    * @param body
    */
-  public post = async <T>(path: string, body: Record<string, string> = {}): Promise<T> => {
-    const formBody = Object.keys(body).map((key) => {
+  protected buildFormBody = (body: Record<string, string>) => {
+    return Object.keys(body).map((key) => {
       return `${encodeURIComponent(key)}=${encodeURIComponent(body[key])}`
     }).join('&');
-
-    const resp = await this.request.fetch(`${this.baseUrl}${path}`, {
-      method: 'POST',
-      body: formBody,
-      headers: new Headers({
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      }),
-    });
-    if (!resp.ok) {
-      throw new RequestError(resp.statusText, resp.status);
-    }
-
-    return resp.json();
   }
 
   /**
