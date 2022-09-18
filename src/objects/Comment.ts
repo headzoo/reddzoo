@@ -67,4 +67,13 @@ export class Comment extends SubRedditObject {
 
     return true;
   }
+
+  /**
+   *
+   */
+  public ignoreReports = async (): Promise<boolean> => {
+    await this.api.post<any>(`/api/ignore_reports?id=t1_${this.id}`);
+
+    return true;
+  }
 }
