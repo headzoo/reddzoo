@@ -144,4 +144,9 @@ export class Subreddit {
 
     return new WikiPage(this, resp.data, page);
   }
+
+  /**
+   *
+   */
+  public clearCaches = async (): Promise<void> => {}
 }

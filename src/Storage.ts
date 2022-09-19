@@ -1,6 +1,6 @@
 export interface Storage {
   set: (key: string, values: any, expiration?: number) => Promise<any>;
-  get: (key: string, defaultValue?: any) => Promise<any>;
+  get: <T>(key: string, defaultValue?: any) => Promise<T|null>;
   remove: (key: string) => Promise<void>;
 }
 
@@ -30,14 +30,14 @@ export class MemoryStorage implements Storage {
    * @param key
    * @param defaultValue
    */
-  get = (key: string, defaultValue: any = null): Promise<any> => {
+  get = <T>(key: string, defaultValue: any = null): Promise<T|null> => {
     return new Promise((resolve) => {
       if (this.values[key] === undefined) {
         resolve(defaultValue);
         return;
       }
 
-      this.resolveValue(this.values, key, defaultValue)
+      this.resolveValue<T>(this.values, key, defaultValue)
         .then(resolve);
     });
   }
@@ -57,7 +57,7 @@ export class MemoryStorage implements Storage {
    * @param key
    * @param defaultValue
    */
-  protected resolveValue = (resp: any, key: string, defaultValue: any = undefined) => {
+  protected resolveValue = <T>(resp: any, key: string, defaultValue: any = undefined): Promise<T> => {
     return new Promise((resolve) => {
       const stored = resp[key];
       const { _expiration, _time, _values, ...rest } = stored;

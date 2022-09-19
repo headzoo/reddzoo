@@ -1,5 +1,5 @@
 import { SubRedditObject } from './SubRedditObject';
-import { User } from '../Api';
+import { User } from './User';
 
 /**
  * Represents a single subreddit comment.
