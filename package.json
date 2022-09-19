@@ -14,7 +14,8 @@
     "prepublishOnly": "yarn run build"
   },
   "dependencies": {
-    "@badgateway/oauth2-client": "^2.0.16"
+    "@badgateway/oauth2-client": "^2.0.16",
+    "@types/chrome": "^0.0.197"
   },
   "devDependencies": {
     "typescript": "^4.8.3"

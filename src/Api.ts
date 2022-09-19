@@ -1,4 +1,4 @@
-import { OAuth2Client, OAuth2Fetch } from '@badgateway/oauth2-client';
+import { OAuth2Client, OAuth2Fetch, generateCodeVerifier } from '@badgateway/oauth2-client';
 import { RequestError } from './RequestError';
 import { Subreddit } from './Subreddit';
 import { Storage, MemoryStorage } from './Storage';
@@ -30,13 +30,16 @@ export interface User {
  */
 export class Api {
   public storagePrefix = 'ReddZoo.';
-  public authExpiration = 3600 * 1000;
+  public authExpiration = 0;
+  protected readonly redirectUri = 'https://headzoo.io/modchrome/auth';
   protected readonly baseUrl = 'https://oauth.reddit.com';
   protected readonly client: OAuth2Client;
   protected readonly storage: Storage;
   protected request: OAuth2Fetch;
   protected me: User|null = null;
   protected authListeners: AuthListener[] = [];
+  protected username: string|null = null;
+  protected password: string|null = null;
 
   /**
    * @param config
@@ -50,6 +53,7 @@ export class Api {
       clientId: this.config.clientId,
       clientSecret: this.config.clientSecret,
       tokenEndpoint: '/api/v1/access_token',
+      authorizationEndpoint: '/api/v1/authorize',
     });
     this.request = this.createRequest();
   }
@@ -67,24 +71,70 @@ export class Api {
    *
    */
   public preAuthenticate = async (): Promise<void> => {
-    const creds = await this.storage.get(`${this.storagePrefix}authCreds.${this.id}`);
-    if (creds) {
-      this.request = this.createRequest(creds.username, creds.password);
+    const token = await this.storage.get(`${this.storagePrefix}authToken.${this.id}`);
+    if (token) {
+      this.request = this.createRequest();
       const m = await this.storage.get(`${this.storagePrefix}authMe.${this.id}`);
       if (m) {
         this.me = m;
         await this.triggerAuth(true);
       }
     }
+    // const creds = await this.storage.get(`${this.storagePrefix}authCreds.${this.id}`);
+    /*if (creds) {
+      this.request = this.createRequest();
+      const m = await this.storage.get(`${this.storagePrefix}authMe.${this.id}`);
+      if (m) {
+        this.me = m;
+        await this.triggerAuth(true);
+      }
+    }*/
   }
 
   /**
    *
    */
-  public signIn = async (username: string, password: string): Promise<boolean> => {
+  public beginOauthFlow = async (): Promise<void> => {
+    const codeVerifier = await generateCodeVerifier();
+    const scopes = 'identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread';
+    const url = `https://www.reddit.com/api/v1/authorize?client_id=${this.config.clientId}&response_type=code&state=${codeVerifier}&redirect_uri=${encodeURIComponent(this.redirectUri)}&duration=permanent&scope=${encodeURIComponent(scopes)}`
+    if (chrome && chrome.tabs) {
+      await chrome.tabs.create({url});
+    } else {
+      window.open(url);
+    }
+  }
+
+  /**
+   * @param url
+   */
+  public verifyOauthResponse = async (url: string): Promise<boolean> => {
+    const codeVerifier = await generateCodeVerifier();
+    const oauth2Token = await this.client.authorizationCode.getTokenFromCodeRedirect(url, {
+        redirectUri: this.redirectUri,
+        codeVerifier,
+    });
+    await this.storage.set(`${this.storagePrefix}authToken.${this.id}`, oauth2Token);
+    this.request = this.createRequest();
+
+    return !!oauth2Token;
+  }
+
+  /**
+   * @param username
+   * @param password
+   */
+  public signIn = async (username = '', password = ''): Promise<boolean> => {
     try {
       this.me = null;
-      this.request = this.createRequest(username, password);
+      this.username = null;
+      this.password = null;
+
+      if (username && password) {
+        this.username = username;
+        this.password = password;
+        this.request = this.createRequest();
+      }
 
       const m = await this.storage.get(`${this.storagePrefix}authMe.${this.id}`);
       if (m) {
@@ -100,6 +150,7 @@ export class Api {
       const resp = await this.request.fetch(`${this.baseUrl}/api/v1/me`, {
         method: 'GET',
         headers: new Headers({
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
         }),
       });
@@ -110,7 +161,6 @@ export class Api {
 
       this.me = await resp.json();
       await this.storage.set(`${this.storagePrefix}authMe.${this.id}`, this.me, this.authExpiration);
-      await this.storage.set(`${this.storagePrefix}authCreds.${this.id}`, {username, password}, this.authExpiration);
       if ((await this.triggerAuth(true)).isPrevented) {
         await this.logOut();
         return false;
@@ -131,9 +181,10 @@ export class Api {
    */
   public logOut = async (): Promise<void> => {
     await this.storage.remove(`${this.storagePrefix}authMe.${this.id}`);
-    await this.storage.remove(`${this.storagePrefix}authCreds.${this.id}`);
     await this.storage.remove(`${this.storagePrefix}authToken.${this.id}`);
     this.me = null;
+    this.username = null;
+    this.password = null;
     await this.triggerAuth(false);
   }
 
@@ -253,17 +304,16 @@ export class Api {
   }
 
   /**
-   * @param username
-   * @param password
+   *
    */
-  protected createRequest = (username: string = '', password: string = ''): OAuth2Fetch => {
+  protected createRequest = (): OAuth2Fetch => {
     return new OAuth2Fetch({
       client: this.client,
       getNewToken: async () => {
-        if (username && password) {
+        if (this.username && this.password) {
           return this.client.password({
-            username,
-            password,
+            username: this.username,
+            password: this.password,
           });
         }
         return null;
