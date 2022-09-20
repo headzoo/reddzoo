@@ -10,6 +10,7 @@ import { Post } from './objects/Post';
 import { Event } from './events/Event';
 import { SignInEvent } from './events/SignInEvent';
 import { SignOutEvent } from './events/SignOutEvent';
+import { AuthErrorEvent } from './events/AuthErrorEvent';
 import { Subreddit } from './Subreddit';
 import { Storage, MemoryStorage } from './Storage';
 
@@ -27,6 +28,7 @@ export {
   Event,
   SignInEvent,
   SignOutEvent,
+  AuthErrorEvent,
   Moderator,
 };
 

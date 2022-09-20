@@ -1,5 +1,4 @@
 import { Event } from './Event';
-import { User } from '../objects/User';
 
 /**
  *

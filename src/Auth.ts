@@ -4,6 +4,7 @@ import { Config } from './Api';
 import { EventEmitter } from './events/EventEmitter';
 import { SignInEvent } from './events/SignInEvent';
 import { SignOutEvent } from './events/SignOutEvent';
+import { AuthErrorEvent } from './events/AuthErrorEvent';
 
 interface Creds {
   username: string;
@@ -13,6 +14,7 @@ interface Creds {
 type AuthEvents = {
   signIn: (e: SignInEvent) => Promise<void>;
   signOut: (e: SignOutEvent) => Promise<void>;
+  error: (e: AuthErrorEvent) => Promise<void>;
 }
 
 /**
@@ -260,6 +262,10 @@ export class Auth {
     return new OAuth2Fetch({
       client: this.client,
       getNewToken: async () => {
+        const token = await this.storage.get<OAuth2Token>(this.keyAuthToken, null);
+        if (token) {
+          return token;
+        }
         if (creds && creds.username && creds.password) {
           return this.client.password({
             username: creds.username,
@@ -276,6 +282,7 @@ export class Auth {
       },
       onError: (err) => {
         console.error(err);
+        this.eventEmitted.emit(new AuthErrorEvent(err));
       }
     });
   }
