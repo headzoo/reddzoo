@@ -23,12 +23,35 @@ export class Auth {
   protected readonly client: OAuth2Client;
   public request!: OAuth2Fetch;
   protected readonly eventEmitted: EventEmitter<AuthEvents> = new EventEmitter<AuthEvents>();
-  protected readonly baseUrl = 'https://oauth.reddit.com';
-  protected readonly redirectUri = 'https://headzoo.io/modchrome/auth';
+  public readonly baseUrl = 'https://oauth.reddit.com';
+  public redirectUri = 'https://headzoo.io/reddmoderator/auth/index.html';
   public me: any|null = null;
   protected keyAuthToken!: string;
   protected keyAuthCreds!: string;
   protected keyAuthMe!: string;
+  public scopes: string[] = [
+    'identity',
+    'edit',
+    'flair',
+    'history',
+    'modconfig',
+    'modflair',
+    'modlog',
+    'modposts',
+    'modwiki',
+    'modcontributors',
+    'modnote',
+    'mysubreddits',
+    'privatemessages',
+    'read',
+    'report',
+    'save',
+    'submit',
+    'subscribe',
+    'vote',
+    'wikiedit',
+    'wikiread',
+  ];
 
   /**
    * @param id
@@ -83,7 +106,7 @@ export class Auth {
    */
   public beginOauthFlow = async (): Promise<void> => {
     const codeVerifier = await generateCodeVerifier();
-    const scopes = 'identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,modnote,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread';
+    const scopes = this.scopes.join(',');
     const url = `https://www.reddit.com/api/v1/authorize?client_id=${this.config.clientId}&response_type=code&state=${codeVerifier}&redirect_uri=${encodeURIComponent(this.redirectUri)}&duration=permanent&scope=${encodeURIComponent(scopes)}`
     if (chrome && chrome.tabs) {
       await chrome.tabs.create({url});
