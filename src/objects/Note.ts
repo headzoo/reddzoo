@@ -1,5 +1,5 @@
 import { SubRedditObject } from './SubRedditObject';
-import { Subreddit } from '@src/Subreddit';
+import { Subreddit } from '../Subreddit';
 
 export interface UserNoteData {
   label: string;
@@ -29,7 +29,7 @@ export class Note extends SubRedditObject {
    *
    */
   public delete = async (): Promise<boolean> => {
-    await this.api.delete<any>(`/api/mod/notes?id=${this.id}&subreddit=${this.subreddit.name}&user=${this.username}`);
+    await this.api.delete<any>(`/api/mod/notes?note_id=${this.id}&subreddit=${this.subreddit.name}&user=${this.username}`);
     return true;
   }
 }

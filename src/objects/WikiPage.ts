@@ -1,5 +1,5 @@
 import { SubRedditObject } from './SubRedditObject';
-import { Subreddit } from '@src/Subreddit';
+import { Subreddit } from '../Subreddit';
 
 /**
  *
