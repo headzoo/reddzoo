@@ -5,6 +5,7 @@ import { ModQueueItem } from './objects/ModQueueItem';
 import { Moderator } from './objects/Moderator';
 import { Note } from './objects/Note';
 import { Rule } from './objects/Rule';
+import { Post } from './objects/Post';
 import { WikiPage } from './objects/WikiPage';
 
 /**
@@ -76,7 +77,7 @@ export class Subreddit {
    * @param note
    */
   public saveUserNote = async (username: string, label: string, commentId: string, note: string): Promise<Note> => {
-    const resp = await this.api.post<Note>('/api/mod/notes', {
+    const resp = await this.api.post<{ created: Note }>('/api/mod/notes', {
       user: username,
       subreddit: this.name,
       reddit_id: `t1_${commentId}`,
@@ -84,7 +85,7 @@ export class Subreddit {
       note,
     });
 
-    return new Note(this, resp, username);
+    return new Note(this, resp.created, username);
   }
 
   /**
@@ -116,8 +117,19 @@ export class Subreddit {
   /**
    *
    */
-  public getRecentComments = async (): Promise<void> => {
-    const resp = await this.api.get<any>(`/r/${this.name}/comments.json?after=t1_ios42gy`);
+  public getRecentPosts = async (): Promise<Post[]> => {
+    const resp = await this.api.get<any>(`/r/${this.name}.json`);
+
+    return resp.data.children.map((child: any) => {
+      return new Post(this, child.data);
+    });
+  }
+
+  /**
+   *
+   */
+  public getRecentComments = async (): Promise<Comment[]> => {
+    const resp = await this.api.get<any>(`/r/${this.name}/comments.json`);
 
     return resp.data.children.map((child: any) => {
       return new Comment(this, child.data);

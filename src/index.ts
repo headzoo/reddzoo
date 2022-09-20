@@ -6,6 +6,7 @@ import { Rule } from './objects/Rule';
 import { WikiPage } from './objects/WikiPage';
 import { Moderator } from './objects/Moderator';
 import { User } from './objects/User';
+import { Post } from './objects/Post';
 import { Event } from './events/Event';
 import { SignInEvent } from './events/SignInEvent';
 import { SignOutEvent } from './events/SignOutEvent';
@@ -18,6 +19,7 @@ export {
   MemoryStorage,
   Comment,
   ModQueueItem,
+  Post,
   User,
   Note,
   Rule,
