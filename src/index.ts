@@ -7,6 +7,7 @@ import { WikiPage } from './objects/WikiPage';
 import { Moderator } from './objects/Moderator';
 import { User } from './objects/User';
 import { Post } from './objects/Post';
+import { Thing } from './objects/Thing';
 import { Event } from './events/Event';
 import { SignInEvent } from './events/SignInEvent';
 import { SignOutEvent } from './events/SignOutEvent';
@@ -35,4 +36,5 @@ export {
 export type {
   Config,
   Storage,
+  Thing,
 };

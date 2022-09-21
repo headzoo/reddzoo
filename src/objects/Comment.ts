@@ -1,10 +1,12 @@
 import { SubRedditObject } from './SubRedditObject';
 import { User } from './User';
+import { Thing } from './Thing';
 
 /**
  * Represents a single subreddit comment.
  */
-export class Comment extends SubRedditObject {
+export class Comment extends SubRedditObject implements Thing {
+  public readonly typePrefix = 't1_';
   public id!: string;
   public name!: string;
   public author!: string;

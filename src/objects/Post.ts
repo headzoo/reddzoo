@@ -1,9 +1,11 @@
 import { SubRedditObject } from './SubRedditObject';
+import { Thing } from './Thing';
 
 /**
  *
  */
-export class Post extends SubRedditObject {
+export class Post extends SubRedditObject implements Thing {
+  public readonly typePrefix = 't3_';
   public id!: string;
   public name!: string;
   public permalink!: string;

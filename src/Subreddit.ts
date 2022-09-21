@@ -117,8 +117,8 @@ export class Subreddit {
   /**
    *
    */
-  public getRecentPosts = async (): Promise<Post[]> => {
-    const resp = await this.api.get<any>(`/r/${this.name}.json`);
+  public getPosts = async (sort: 'new'|'top'|'hot' = 'hot'): Promise<Post[]> => {
+    const resp = await this.api.get<any>(`/r/${this.name}/${sort}.json`);
 
     return resp.data.children.map((child: any) => {
       return new Post(this, child.data);
@@ -128,7 +128,7 @@ export class Subreddit {
   /**
    *
    */
-  public getRecentComments = async (): Promise<Comment[]> => {
+  public getComments = async (): Promise<Comment[]> => {
     const resp = await this.api.get<any>(`/r/${this.name}/comments.json`);
 
     return resp.data.children.map((child: any) => {
