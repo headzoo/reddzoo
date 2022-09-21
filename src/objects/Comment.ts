@@ -23,6 +23,10 @@ export class Comment extends SubRedditObject {
   public readonly locked!: boolean;
   public readonly numReports!: number;
   public readonly stickied!: boolean;
+  public readonly linkId!: string;
+  public readonly linkPermalink!: string;
+  public readonly linkTitle!: string;
+  public readonly linkAuthor!: string;
 
   /**
    *

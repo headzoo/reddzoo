@@ -17,4 +17,5 @@ export class User extends RedditObject {
   public readonly linkKarma!: number;
   public readonly commentKarma!: number;
   public readonly totalKarma!: number;
+  public readonly prefNightmode!: boolean;
 }
