@@ -36,4 +36,14 @@ export class Post extends SubRedditObject {
 
     return true;
   }
+
+
+  /**
+   * @param spam
+   */
+  public remove = async (spam = false): Promise<boolean> => {
+    await this.api.post<any>(`/api/remove?id=t3_${this.id}&spam=${spam ? 1 : 0}`);
+
+    return true;
+  }
 }

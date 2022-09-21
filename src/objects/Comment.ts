@@ -18,6 +18,7 @@ export class Comment extends SubRedditObject {
   public score!: number;
   public permalink!: string;
   public approved!: boolean;
+  public removed!: boolean;
   public archived!: boolean;
   public edited!: boolean;
   public locked!: boolean;
@@ -69,6 +70,15 @@ export class Comment extends SubRedditObject {
    */
   public approve = async (): Promise<boolean> => {
     await this.api.post<any>(`/api/approve?id=t1_${this.id}`);
+
+    return true;
+  }
+
+  /**
+   * @param spam
+   */
+  public remove = async (spam = false): Promise<boolean> => {
+    await this.api.post<any>(`/api/remove?id=t1_${this.id}&spam=${spam ? 1 : 0}`);
 
     return true;
   }
