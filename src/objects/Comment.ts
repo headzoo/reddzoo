@@ -5,28 +5,29 @@ import { User } from './User';
  * Represents a single subreddit comment.
  */
 export class Comment extends SubRedditObject {
-  public readonly id!: string;
-  public readonly name!: string;
-  public readonly author!: string;
-  public readonly authorId!: string;
-  public readonly body!: string;
-  public readonly bodyHtml!: string;
-  public readonly created!: number;
-  public readonly createdUtc!: number;
-  public readonly downs!: number;
-  public readonly ups!: number;
-  public readonly score!: number;
-  public readonly permalink!: string;
-  public readonly approved!: boolean;
-  public readonly archived!: boolean;
-  public readonly edited!: boolean;
-  public readonly locked!: boolean;
-  public readonly numReports!: number;
-  public readonly stickied!: boolean;
-  public readonly linkId!: string;
-  public readonly linkPermalink!: string;
-  public readonly linkTitle!: string;
-  public readonly linkAuthor!: string;
+  public id!: string;
+  public name!: string;
+  public author!: string;
+  public authorId!: string;
+  public body!: string;
+  public bodyHtml!: string;
+  public created!: number;
+  public createdUtc!: number;
+  public downs!: number;
+  public ups!: number;
+  public score!: number;
+  public permalink!: string;
+  public approved!: boolean;
+  public archived!: boolean;
+  public edited!: boolean;
+  public locked!: boolean;
+  public numReports!: number;
+  public stickied!: boolean;
+  public linkId!: string;
+  public linkPermalink!: string;
+  public linkTitle!: string;
+  public linkAuthor!: string;
+  public likes!: boolean|null;
 
   /**
    *
@@ -77,6 +78,15 @@ export class Comment extends SubRedditObject {
    */
   public ignoreReports = async (): Promise<boolean> => {
     await this.api.post<any>(`/api/ignore_reports?id=t1_${this.id}`);
+
+    return true;
+  }
+
+  /**
+   * @param dir
+   */
+  public vote = async (dir: 1|0|-1): Promise<boolean> => {
+    await this.api.post<any>(`/api/vote?id=t1_${this.id}&dir=${dir}`);
 
     return true;
   }

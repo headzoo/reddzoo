@@ -4,11 +4,11 @@ import { SubRedditObject } from './SubRedditObject';
  *
  */
 export class Moderator extends SubRedditObject {
-  public readonly id!: string;
-  public readonly relId!: string;
-  public readonly date!: number;
-  public readonly name!: string;
-  public readonly authorFlairCssClass!: string;
-  public readonly authorFlairText!: string;
-  public readonly modPermissions!: string[];
+  public id!: string;
+  public relId!: string;
+  public date!: number;
+  public name!: string;
+  public authorFlairCssClass!: string;
+  public authorFlairText!: string;
+  public modPermissions!: string[];
 }

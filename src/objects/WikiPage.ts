@@ -5,12 +5,12 @@ import { Subreddit } from '../Subreddit';
  *
  */
 export class WikiPage extends SubRedditObject {
-  public readonly page: string;
-  public readonly contentHtml!: string;
-  public readonly contentMd!: string;
-  public readonly reason!: string;
-  public readonly revisionDate!: number;
-  public readonly revisionId!: string;
+  public page: string;
+  public contentHtml!: string;
+  public contentMd!: string;
+  public reason!: string;
+  public revisionDate!: number;
+  public revisionId!: string;
 
   /**
    * @param subreddit

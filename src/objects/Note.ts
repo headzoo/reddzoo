@@ -9,11 +9,11 @@ export interface UserNoteData {
  *
  */
 export class Note extends SubRedditObject {
-  public readonly id!: string;
-  public readonly type!: string;
-  public readonly createdAt!: number;
-  public readonly userNoteData!: UserNoteData;
-  public readonly username: string;
+  public id!: string;
+  public type!: string;
+  public createdAt!: number;
+  public userNoteData!: UserNoteData;
+  public username: string;
 
   /**
    * @param subreddit
