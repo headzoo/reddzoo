@@ -26,7 +26,7 @@ export class Auth {
   public request!: OAuth2Fetch;
   protected readonly eventEmitted: EventEmitter<AuthEvents> = new EventEmitter<AuthEvents>();
   public readonly baseUrl = 'https://oauth.reddit.com';
-  public redirectUri = 'https://headzoo.io/redderoo/auth/index.html';
+  public redirectUri = 'https://redderoo.com/auth/index.html';
   public me: any|null = null;
   protected keyAuthToken!: string;
   protected keyAuthCreds!: string;
