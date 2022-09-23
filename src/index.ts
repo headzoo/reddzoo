@@ -31,10 +31,10 @@ export {
   SignOutEvent,
   AuthErrorEvent,
   Moderator,
+  Thing,
 };
 
 export type {
   Config,
   Storage,
-  Thing,
 };

@@ -1,13 +1,10 @@
-import { SubRedditObject } from './SubRedditObject';
 import { User } from './User';
 import { Thing } from './Thing';
 
 /**
  * Represents a single subreddit comment.
  */
-export class Comment extends SubRedditObject implements Thing {
-  public readonly typePrefix = 't1_';
-  public id!: string;
+export class Comment extends Thing {
   public name!: string;
   public author!: string;
   public authorId!: string;
@@ -15,12 +12,6 @@ export class Comment extends SubRedditObject implements Thing {
   public bodyHtml!: string;
   public created!: number;
   public createdUtc!: number;
-  public downs!: number;
-  public ups!: number;
-  public score!: number;
-  public permalink!: string;
-  public approved!: boolean;
-  public removed!: boolean;
   public archived!: boolean;
   public edited!: boolean;
   public locked!: boolean;
@@ -30,7 +21,13 @@ export class Comment extends SubRedditObject implements Thing {
   public linkPermalink!: string;
   public linkTitle!: string;
   public linkAuthor!: string;
-  public likes!: boolean|null;
+
+  /**
+   *
+   */
+  public getTypePrefix(): string {
+    return 't1';
+  }
 
   /**
    *
@@ -63,42 +60,6 @@ export class Comment extends SubRedditObject implements Thing {
    */
   public distinguish = async (): Promise<boolean> => {
     await this.api.post<any>(`/api/distinguish?id=t1_${this.id}&how=yes`);
-
-    return true;
-  }
-
-  /**
-   *
-   */
-  public approve = async (): Promise<boolean> => {
-    await this.api.post<any>(`/api/approve?id=t1_${this.id}`);
-
-    return true;
-  }
-
-  /**
-   * @param spam
-   */
-  public remove = async (spam = false): Promise<boolean> => {
-    await this.api.post<any>(`/api/remove?id=t1_${this.id}&spam=${spam ? 1 : 0}`);
-
-    return true;
-  }
-
-  /**
-   *
-   */
-  public ignoreReports = async (): Promise<boolean> => {
-    await this.api.post<any>(`/api/ignore_reports?id=t1_${this.id}`);
-
-    return true;
-  }
-
-  /**
-   * @param dir
-   */
-  public vote = async (dir: 1|0|-1): Promise<boolean> => {
-    await this.api.post<any>(`/api/vote?id=t1_${this.id}&dir=${dir}`);
 
     return true;
   }
