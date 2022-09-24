@@ -11,6 +11,7 @@ export class Comment extends Thing {
   public body!: string;
   public bodyHtml!: string;
   public created!: number;
+  public parentId!: string;
   public createdUtc!: number;
   public archived!: boolean;
   public edited!: boolean;
@@ -21,6 +22,7 @@ export class Comment extends Thing {
   public linkPermalink!: string;
   public linkTitle!: string;
   public linkAuthor!: string;
+  public controversiality!: number;
 
   /**
    *

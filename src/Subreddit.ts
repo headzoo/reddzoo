@@ -7,6 +7,7 @@ import { Note } from './objects/Note';
 import { Rule } from './objects/Rule';
 import { Post } from './objects/Post';
 import { WikiPage } from './objects/WikiPage';
+import { AboutSubreddit } from './objects/AboutSubreddit';
 
 /**
  * Represents access to a subreddit.
@@ -24,6 +25,15 @@ export class Subreddit {
     protected readonly storage: Storage,
     public storagePrefix: string,
   ) {
+  }
+
+  /**
+   *
+   */
+  public about = async (): Promise<AboutSubreddit> => {
+    const resp = await this.api.get<any>(`/r/${this.name}/about`);
+
+    return new AboutSubreddit(this, resp.data);
   }
 
   /**
@@ -140,7 +150,7 @@ export class Subreddit {
    * @param commentId
    */
   public getComment = async (commentId: string): Promise<Comment|null> => {
-    const resp = await this.api.get<any>(`/r/${this.name}/api/info?id=t1_${commentId}`);
+    const resp = await this.api.get<any>(`/r/${this.name}/api/info?id=t1_${commentId.replace('t1_', '')}`);
     if (resp.data.children.length === 0) {
       return null;
     }

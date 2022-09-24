@@ -8,6 +8,7 @@ import { Moderator } from './objects/Moderator';
 import { User } from './objects/User';
 import { Post } from './objects/Post';
 import { Thing } from './objects/Thing';
+import { AboutSubreddit } from './objects/AboutSubreddit';
 import { Event } from './events/Event';
 import { SignInEvent } from './events/SignInEvent';
 import { SignOutEvent } from './events/SignOutEvent';
