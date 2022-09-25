@@ -13,6 +13,7 @@ export abstract class Thing extends SubRedditObject {
   public removed!: boolean;
   public permalink!: string;
   public modReports!: string[];
+  public userReports!: string[];
 
   /**
    *

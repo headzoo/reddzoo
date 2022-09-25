@@ -7,6 +7,7 @@ import { Note } from './objects/Note';
 import { Rule } from './objects/Rule';
 import { Post } from './objects/Post';
 import { WikiPage } from './objects/WikiPage';
+import { Snoomoji } from './objects/Snoomoji';
 import { AboutSubreddit } from './objects/AboutSubreddit';
 
 /**
@@ -34,6 +35,23 @@ export class Subreddit {
     const resp = await this.api.get<any>(`/r/${this.name}/about`);
 
     return new AboutSubreddit(this, resp.data);
+  }
+
+  /**
+   *
+   */
+  public getEmojis = async (): Promise<Snoomoji[]> => {
+    const resp = await this.api.get<any>(`/api/v1/${this.name}/emojis/all`);
+    if (!resp.snoomojis) {
+      return [];
+    }
+
+    const snoomojis: Snoomoji[] = [];
+    Object.keys(resp.snoomojis).forEach((key) => {
+      snoomojis.push(new Snoomoji(this, snoomojis[key as any], key));
+    });
+
+    return snoomojis;
   }
 
   /**
