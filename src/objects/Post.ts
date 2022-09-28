@@ -1,4 +1,6 @@
 import { Thing } from './Thing';
+import { Subreddit } from '../Subreddit';
+import { Award } from './Award';
 
 /**
  *
@@ -21,11 +23,30 @@ export class Post extends Thing {
   public domain!: string;
   public created!: number;
   public createdUtc!: number;
+  public thumbnail!: string;
+  public thumbnailHeight!: string;
+  public thumbnailWidth!: string;
+  public allAwardings!: Award[];
 
   /**
    *
    */
   public getTypePrefix(): string {
     return 't3';
+  }
+
+  /**
+   * @param subreddit
+   * @param raw
+   */
+  constructor(subreddit: Subreddit, raw: any) {
+    super(subreddit, raw);
+
+    if (raw.all_awardings) {
+      this.allAwardings = [];
+      for (let i = 0; i < raw.all_awardings.length; i++) {
+        this.allAwardings.push(new Award(this.subreddit, raw.all_awardings[i]));
+      }
+    }
   }
 }

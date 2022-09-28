@@ -1,5 +1,7 @@
 import { User } from './User';
 import { Thing } from './Thing';
+import { Subreddit } from '../Subreddit';
+import { Award } from './Award';
 
 /**
  * Represents a single subreddit comment.
@@ -23,6 +25,22 @@ export class Comment extends Thing {
   public linkTitle!: string;
   public linkAuthor!: string;
   public controversiality!: number;
+  public allAwardings!: Award[];
+
+  /**
+   * @param subreddit
+   * @param raw
+   */
+  constructor(subreddit: Subreddit, raw: any) {
+    super(subreddit, raw);
+
+    if (raw.all_awardings) {
+      this.allAwardings = [];
+      for (let i = 0; i < raw.all_awardings.length; i++) {
+        this.allAwardings.push(new Award(this.subreddit, raw.all_awardings[i]));
+      }
+    }
+  }
 
   /**
    *

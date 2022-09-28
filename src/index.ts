@@ -1,3 +1,4 @@
+import { OAuth2Token } from '@badgateway/oauth2-client';
 import { Api, Config } from './Api';
 import { Comment } from './objects/Comment';
 import { ModQueueItem } from './objects/ModQueueItem';
@@ -8,6 +9,7 @@ import { Moderator } from './objects/Moderator';
 import { User } from './objects/User';
 import { Post } from './objects/Post';
 import { Thing } from './objects/Thing';
+import { Award } from './objects/Award';
 import { AboutSubreddit } from './objects/AboutSubreddit';
 import { Event } from './events/Event';
 import { SignInEvent } from './events/SignInEvent';
@@ -22,11 +24,13 @@ export {
   MemoryStorage,
   Comment,
   ModQueueItem,
+  AboutSubreddit,
   Post,
   User,
   Note,
   Rule,
   WikiPage,
+  Award,
   Event,
   SignInEvent,
   SignOutEvent,
@@ -38,4 +42,5 @@ export {
 export type {
   Config,
   Storage,
+  OAuth2Token,
 };

@@ -22,6 +22,7 @@ type AuthEvents = {
  */
 export class Auth {
   public authExpiration = 0;
+  public token: OAuth2Token | null = null;
   protected readonly client: OAuth2Client;
   public request!: OAuth2Fetch;
   protected readonly eventEmitted: EventEmitter<AuthEvents> = new EventEmitter<AuthEvents>();
@@ -122,13 +123,13 @@ export class Auth {
    */
   public verifyOauthResponse = async (url: string): Promise<boolean> => {
     const codeVerifier = await generateCodeVerifier();
-    const oauth2Token = await this.client.authorizationCode.getTokenFromCodeRedirect(url, {
+    this.token = await this.client.authorizationCode.getTokenFromCodeRedirect(url, {
       redirectUri: this.redirectUri,
       codeVerifier,
     });
-    await this.storage.set(this.keyAuthToken, oauth2Token);
+    await this.storage.set(this.keyAuthToken, this.token);
 
-    return !!oauth2Token;
+    return !!this.token;
   }
 
   /**
@@ -153,8 +154,8 @@ export class Auth {
         }
       }
 
-      const token = await this.storage.get<OAuth2Token>(this.keyAuthToken);
-      if (token) {
+      this.token = await this.storage.get<OAuth2Token>(this.keyAuthToken);
+      if (this.token) {
         const me = await this.storage.get<any>(this.keyAuthMe);
         if (me && typeof me === 'object' && me.name) {
           this.me = me;
@@ -262,6 +263,9 @@ export class Auth {
     return new OAuth2Fetch({
       client: this.client,
       getNewToken: async () => {
+        if (this.token) {
+          return this.token;
+        }
         const token = await this.storage.get<OAuth2Token>(this.keyAuthToken, null);
         if (token) {
           return token;
@@ -278,7 +282,11 @@ export class Auth {
         await this.storage.set(this.keyAuthToken, token);
       },
       getStoredToken: async () => {
-        return await this.storage.get(this.keyAuthToken, null);
+        if (this.token) {
+          return this.token;
+        }
+        this.token = await this.storage.get(this.keyAuthToken, null);
+        return this.token;
       },
       onError: (err) => {
         console.error(err);
