@@ -24,6 +24,7 @@ export class Comment extends Thing {
   public linkPermalink!: string;
   public linkTitle!: string;
   public linkAuthor!: string;
+  public linkUrl!: string;
   public controversiality!: number;
   public allAwardings!: Award[];
 

@@ -5,13 +5,22 @@ import { Api } from '../Api';
  */
 export class RedditObject {
   protected snakeToCamelRegEx = new RegExp('([-_][a-z])', 'g');
+  protected readonly raw: any;
 
   /**
    * @param api
    * @param raw
    */
   constructor(public readonly api: Api, raw: any) {
+    this.raw = raw;
     this.mergeValues(raw);
+  }
+
+  /**
+   *
+   */
+  public toJSON = (): any => {
+    return this.snakeToCamel(this.raw);
   }
 
   /**
